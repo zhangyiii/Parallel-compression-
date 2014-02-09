@@ -31,7 +31,7 @@ pair<char*,int> bwt_encode(char *input, int N) {
 char* bwt_decode(pair<char*,int> enc, int N) {
     char *input = enc.first;
     int I = enc.second;
-    int *C = new int[ALPHABET_SIZE+1], *P = new int[N+1];
+    int C[ALPHABET_SIZE+1], P[N+1];
     
     for(int i=0; i<ALPHABET_SIZE; i++) C[i]=0;
     for(int i=0; i<N; i++) {
@@ -49,8 +49,6 @@ char* bwt_decode(pair<char*,int> enc, int N) {
         j = P[j] + C[input[j]-ALPHABET_FIRST];
     }
 
-    delete[] C;
-    delete[] P;
     return S;
 }
 
