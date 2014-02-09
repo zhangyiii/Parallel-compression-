@@ -13,8 +13,8 @@ void test(int trials) {
         char *input = new char[N+1];
         input[N]=0;
         for(int i=0; i<N; i++)input[i] = 'A'+rand()%26;
-        pair<char*,int> p = BurrowsWheeler::encode(input,N);
-        char *output =  BurrowsWheeler::decode(p,N);
+        pair<char*,int> p = bwt_encode(input,N);
+        char *output =  bwt_decode(p,N);
         assert(strcmp(input,output)==0);
         delete[] input;
         delete[] p.first;
