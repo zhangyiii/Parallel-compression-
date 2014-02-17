@@ -11,6 +11,6 @@ test_mtf: test_mtf.cpp $(DIR)/MoveToFront.cpp $(DIR)/MoveToFront.hpp
 	g++ $(OPTS) -o test_mtf test_mtf.cpp $(DIR)/MoveToFront.cpp
 
 test_huff: test_huff.cpp $(DIR)/huffman.cpp $(DIR)/huffman.hpp
-	g++ $(OPTS) -o test_huff test_huff.cpp $(DIR)/huffman.cpp
+	g++ $(OPTS) -o test_huff test_huff.cpp $(DIR)/huffman.cpp -lboost_serialization
 clean:
 	rm -r test_bwt test_mtf test_huff
