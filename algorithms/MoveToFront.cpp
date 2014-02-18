@@ -17,7 +17,7 @@ void mtf_encode (char *buf_in, char *buf_out, int size) {
         buf_out[i] = state[buf_in[i]-'A']+'A';
         #pragma omp parallel
     	{
-    		#pragma omp for schedule(static) nowait
+    		#pragma omp for schedule(static) nowait firstprivate(i)
        		for (int j = 0; j<ALPHABET_SIZE; ++j) {
            		if (state[j] < state[buf_in[i]-'A'])
                 	++state[j];

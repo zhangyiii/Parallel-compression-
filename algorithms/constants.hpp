@@ -3,6 +3,6 @@
 
 const char ALPHABET_FIRST = 'A';
 const char ALPHABET_LAST = 'Z';
-const int ALPHABET_SIZE = 26;
+const int ALPHABET_SIZE = 5000;
 
 #endif

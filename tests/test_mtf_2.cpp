@@ -10,6 +10,9 @@ int bufferSize = 1000000;
 
 int main() {
 	srand(time(NULL));
+	#pragma omp parallel
+	{
+	#pragma omp for schedule(static) nowait
 	for(int k = 0; k<100; k++) {
 	
 		char * buf_in = new char[bufferSize];
@@ -41,5 +44,6 @@ int main() {
 		delete[] buf_in;
 		delete[] buf_out;
 		delete[] result;
+	}
 	}
 }
