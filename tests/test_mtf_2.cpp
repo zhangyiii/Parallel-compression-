@@ -6,18 +6,18 @@
 
 using namespace std;
 
-int bufferSize = 100000;
+int bufferSize = 1000000;
 
 int main() {
 	srand(time(NULL));
-	for(int k = 0; k<10; k++) {
+	for(int k = 0; k<100; k++) {
 	
 		char * buf_in = new char[bufferSize];
 		char * buf_out = new char[bufferSize];
 		char * result = new char[bufferSize];
 	
 		//for(int i = 0; i<bufferSize; i++)
-		//	scanf("%c", &buf_in[i]);
+		//	scanf("%c", &buf_in[i]); 
 	
 		for(int i=0; i<bufferSize; i++) buf_in[i] = 'A'+rand()%26;
 		

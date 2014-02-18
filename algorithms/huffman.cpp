@@ -76,6 +76,7 @@ vector<char> huff_encode(char *input, int size, string fileName) {
     
     for(int i=0; i<size; i++) P[input[i]-'A']++;
     priority_queue<node*, vector<node*>, mycomparison> Q;
+    
     for(int i=0; i<ALPHABET_SIZE; i++) 
     	if(P[i] > 0)
     		Q.push(new node('A'+i, P[i]));
