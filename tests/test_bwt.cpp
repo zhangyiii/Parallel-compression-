@@ -10,13 +10,11 @@
 using namespace std;
 
 
-void test_correctness(int trials) { 
+void test_seq_correctness(int trials) { 
     srand(time(NULL));
     for(int i=0; i<trials; i++) {
-        int N = 100+rand()%200;
-        char *input = new char[N+1];
-        input[N]=0;
-        for(int i=0; i<N; i++)input[i] = 'A'+rand()%(ALPHABET_SIZE);
+        int N = 1000+rand()%9000;
+        char *input = getRandomInput(N);
         pair<char*,int> p = seq_bwt_encode(input,N);
         char *output =  seq_bwt_decode(p,N);
         assert(strcmp(input,output)==0);
@@ -24,12 +22,29 @@ void test_correctness(int trials) {
         delete[] p.first;
         delete[] output;
     }
+    cout<<"test_seq_correctness PASSED"<<endl;
+}
+
+void test_par_correctness(int trials) {
+    srand(time(NULL));
+    for(int i=0; i<trials; i++) {
+        int N = 1000+rand()%9000;
+        char *input = getRandomInput(N);
+        pair<char*,int> p = par_bwt_encode(input,N);
+        char *output =  par_bwt_decode(p,N);
+        //cout<<"test "<<i<<endl;
+        //print(input,N);
+        //print(p.first,N);
+        //print(output,N);
+        assert(strcmp(input,output)==0);
+        delete[] input;
+        delete[] p.first;
+        delete[] output;
+    }
+    cout<<"test_par_correctness PASSED"<<endl;
 }
 
 void test_suffix_sort(char *input, int N) {
-    cout<<"input:"<<endl;   
-    for(int i=0; i<N; i++)cout<<input[i];
-    cout<<endl;
     
     function<bool(int,int)> comp = [input,N] (int i,int j) { 
         int k=0;
@@ -49,14 +64,7 @@ void test_suffix_sort(char *input, int N) {
         assert(SUF[i]==v[i]);
     }
 
-    cout<<"PASSED"<<endl;
-}
-
-void test_bwt_result(char *input,int N) {
-    pair<char*,int> p = par_bwt_encode(input,N);
-    pair<char*,int> q = seq_bwt_encode(input,N);
-    assert(strcmp(p.first,q.first)==0);
-    cout<<"PASSED"<<endl;
+    cout<<"test_suffix_sort PASSED"<<endl;
 }
 
 void test_particular(int argc, const char *argv[] ) {
@@ -88,11 +96,13 @@ void test_particular(int argc, const char *argv[] ) {
 
 int main(int argc, const char *argv[]) {
 
-    //test_correctness(1);
-    int n = 2000;
+    test_par_correctness(200);
+    test_seq_correctness(200);
+   /* 
+    int n = 20;
     char *input = getRandomInput(n);
-    test_suffix_sort(input,n+1);
-
+    test_bwt_result(input,n+1);
+    */
     return 0;
 }
 

@@ -1,3 +1,12 @@
+/*
+ * Burrows - Wheeler Transform (sequential and parallel version)
+ *
+ * seq_bwt_encode and par_bwt_encode return pair of the encoded
+ * input with the special index I. The result of par_bwt_encode
+ * contains special character '@' and as such is longer and 
+ * different from the result of the sequential encoding.
+*/
+
 #include<iostream>
 #include<vector>
 #include<cstdio>
@@ -9,10 +18,65 @@
 #include "constants.hpp"
 using namespace std;
 
+
+/*
+ * SEQUENTIAL BWT
+ */
+
+// returns pair of pointer to the encoded string and special index I
+pair<char*,int> seq_bwt_encode(char *input, int N) {
+    char *L = new char[N+1]; L[N]=0;
+    vector<int> tmp;
+    int I;
+    for(int i=0; i<N; i++) tmp.push_back(i);
+
+    function<bool(int,int)> comp = [input,N] (int i,int j) { 
+        int k=0;
+        while(k<N && input[(i+k)%(N)] == input[(j+k)%(N)] ) k++;
+        return input[(i+k)%(N)] < input[(j+k)%(N)];
+    }; 
+
+    sort(tmp.begin(),tmp.end(),comp);
+    for(int i=0; i<N; i++) {
+        if(tmp[i]==0)I=i;
+        L[i]=input[(tmp[i]-1+N)%N];
+    }
+    return make_pair(L,I);
+}
+
+// returns the pointer to the output = decoded input
+char* seq_bwt_decode(pair<char*,int> enc, int N) {
+    char *input = enc.first;
+    int I = enc.second;
+    int C[ALPHABET_SIZE+1], P[N+1];
+    
+    for(int i=0; i<ALPHABET_SIZE; i++) C[i]=0;
+    for(int i=0; i<N; i++) {
+        P[i] = C[input[i]-ALPHABET_FIRST];
+        C[input[i]-ALPHABET_FIRST]++;
+    }
+    for(int i=0,sum=0; i<ALPHABET_SIZE; i++) {
+        sum += C[i];
+        C[i] = sum - C[i];
+    }
+
+    char *S = new char[N+1]; S[N]=0;
+    for(int i=N-1, j=I; i>=0; i--) {
+        S[i] = input[j];
+        j = P[j] + C[input[j]-ALPHABET_FIRST];
+    }
+
+    return S;
+}
+
+/*
+ * PARALLEL BWT
+ */
+
 int get_hash(char *input, int N, int j) {
     int result = 0;
     for(int i=0; i<PREF_WIDTH; i++) 
-        result += (input[(j+i)%N]-(int)'@')*pow(ALPHABET_SIZE,PREF_WIDTH-i-1); // be careful when use special character (-'A' ?)
+        result += (input[(j+i)%N]-(int)'@')*pow(ALPHABET_SIZE,PREF_WIDTH-i-1); 
     return result;
 }
 
@@ -25,7 +89,7 @@ int _min(int a,int b) { return (a<b)?a:b; }
 */
 int* par_suffix_array(char *input, int N) {
     
-    int BLENGTH = pow(ALPHABET_SIZE,PREF_WIDTH);
+    int BLENGTH = pow(ALPHABET_SIZE+1,PREF_WIDTH);
     int *B = new int[BLENGTH], *hashes = new int[N];
     int *SUForiginal = new int[N];
     SUForiginal[0]=N-1; // the first lexicographically is the last one (because it starts with the special character)
@@ -82,7 +146,6 @@ int* par_suffix_array(char *input, int N) {
     }
  }
 
-
  
 /*
     for(int i=0; i<buckets.size(); i++) cout<<buckets[i]<<" ";
@@ -117,57 +180,29 @@ int* par_suffix_array(char *input, int N) {
 }    
 
 pair<char*,int> par_bwt_encode(char *input, int N) {
+    input[N++]='@'; // temporarily we replace 0 with '@'
     int I, *SUF = par_suffix_array(input,N);
     char *L = new char[N+1]; L[N]=0;
     for(int i=0; i<N; i++) {
         if(SUF[i]==0)I=i;
         L[i]=input[(SUF[i]-1+N)%N];
     }
+    input[N-1]=0;
     return make_pair(L,I);
 }
+
 char* par_bwt_decode(pair<char*,int> enc, int N) {
-
-    return NULL;
-}
-
-
-/*
- * SEQUENTIAL BWT
- */
-
-// returns pair of pointer to the encoded string and special index I
-pair<char*,int> seq_bwt_encode(char *input, int N) {
-    char *L = new char[N+1]; L[N]=0;
-    vector<int> tmp;
-    int I;
-    for(int i=0; i<N; i++) tmp.push_back(i);
-
-    function<bool(int,int)> comp = [input,N] (int i,int j) { 
-        int k=0;
-        while(k<N && input[(i+k)%(N+0)] == input[(j+k)%(N+0)] ) k++;
-        return input[(i+k)%(N+0)] < input[(j+k)%(N+0)];
-    }; 
-
-    sort(tmp.begin(),tmp.end(),comp);
-    for(int i=0; i<N; i++) {
-        if(tmp[i]==0)I=i;
-        L[i]=input[(tmp[i]-1+N)%N];
-    }
-    return make_pair(L,I);
-}
-
-// returns the pointer to the output = decoded input
-char* seq_bwt_decode(pair<char*,int> enc, int N) {
+    ++N;
     char *input = enc.first;
     int I = enc.second;
     int C[ALPHABET_SIZE+1], P[N+1];
     
-    for(int i=0; i<ALPHABET_SIZE; i++) C[i]=0;
+    for(int i=0; i<ALPHABET_SIZE+1; i++) C[i]=0;
     for(int i=0; i<N; i++) {
-        P[i] = C[input[i]-ALPHABET_FIRST];
-        C[input[i]-ALPHABET_FIRST]++;
+        P[i] = C[input[i]-'@'];
+        C[input[i]-'@']++;
     }
-    for(int i=0,sum=0; i<ALPHABET_SIZE; i++) {
+    for(int i=0,sum=0; i<ALPHABET_SIZE+1; i++) {
         sum += C[i];
         C[i] = sum - C[i];
     }
@@ -175,9 +210,12 @@ char* seq_bwt_decode(pair<char*,int> enc, int N) {
     char *S = new char[N+1]; S[N]=0;
     for(int i=N-1, j=I; i>=0; i--) {
         S[i] = input[j];
-        j = P[j] + C[input[j]-ALPHABET_FIRST];
+        j = P[j] + C[input[j]-'@'];
     }
 
+    S[N-1]=0;
     return S;
 }
+
+
 

@@ -27,8 +27,8 @@ void print(char *input, int N) {
 char* getRandomInput(int N) {
     srand(time(NULL));
     char *tmp = new char[N+1];
-    tmp[N]='@';
-    for(int i=0; i<N; i++) tmp[i]='A'+rand()%(ALPHABET_SIZE-1); // -1 (without @)
+    tmp[N]=0;
+    for(int i=0; i<N; i++) tmp[i]='A'+rand()%(ALPHABET_SIZE); 
     return tmp; 
 }
 
