@@ -28,7 +28,7 @@ void test_seq_correctness(int trials) {
 void test_par_correctness(int trials) {
     srand(time(NULL));
     for(int i=0; i<trials; i++) {
-        int N = 1000+rand()%9000;
+        int N = 100+rand()%900;
         char *input = getRandomInput(N);
         pair<char*,int> p = par_bwt_encode(input,N);
         char *output =  par_bwt_decode(p,N);
@@ -36,6 +36,11 @@ void test_par_correctness(int trials) {
         //print(input,N);
         //print(p.first,N);
         //print(output,N);
+        if(strcmp(input,output)!=0) {
+         print(input,N);
+         print(p.first,N);
+         print(output,N);
+        }
         assert(strcmp(input,output)==0);
         delete[] input;
         delete[] p.first;
@@ -96,13 +101,9 @@ void test_particular(int argc, const char *argv[] ) {
 
 int main(int argc, const char *argv[]) {
 
-    test_par_correctness(200);
-    test_seq_correctness(200);
-   /* 
-    int n = 20;
-    char *input = getRandomInput(n);
-    test_bwt_result(input,n+1);
-    */
+//    test_par_correctness(100);
+//    test_seq_correctness(20);
+      test_particular(argc,argv);
     return 0;
 }
 

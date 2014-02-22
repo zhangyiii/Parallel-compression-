@@ -76,7 +76,7 @@ char* seq_bwt_decode(pair<char*,int> enc, int N) {
 int get_hash(char *input, int N, int j) {
     int result = 0;
     for(int i=0; i<PREF_WIDTH; i++) 
-        result += (input[(j+i)%N]-(int)'@')*pow(ALPHABET_SIZE,PREF_WIDTH-i-1); 
+        result += (input[(j+i)%N]-(int)'@')*pow(ALPHABET_SIZE+1,PREF_WIDTH-i-1); 
     return result;
 }
 
@@ -96,12 +96,11 @@ int* par_suffix_array(char *input, int N) {
     int *SUF = SUForiginal+1; // for convenience SUF will be the suffix array of the rest of suffixes
 
     for(int i=0; i<BLENGTH; i++)B[i]=0;
-
-    int num_threads = 10;
+    int num_threads = 100;
     int block_width = (N+num_threads)/num_threads;
     omp_set_num_threads(num_threads);
 
- #pragma omp parallel shared(input,N,num_threads,block_width,B)
+ #pragma omp parallel shared(input,B) firstprivate(num_threads,N,block_width)
  {
     int tid = omp_get_thread_num();
     int first = tid * block_width;
@@ -133,7 +132,7 @@ int* par_suffix_array(char *input, int N) {
 
  // the code below is filling the SUF array so that it will be divided into
  // fragments of suffixes with common prefix.
- #pragma omp parallel shared(B,SUF,N)
+ #pragma omp parallel shared(B,SUF) firstprivate(N)
  {
     int tid = omp_get_thread_num();
     int first = tid * block_width;
@@ -146,11 +145,6 @@ int* par_suffix_array(char *input, int N) {
     }
  }
 
- 
-/*
-    for(int i=0; i<buckets.size(); i++) cout<<buckets[i]<<" ";
-    cout<<endl;
-*/
     num_threads = _min(buckets.size(), omp_get_max_threads());
     block_width = (buckets.size()+num_threads)/num_threads;    
 
@@ -161,11 +155,10 @@ int* par_suffix_array(char *input, int N) {
         return input[(i+k)%N] < input[(j+k)%N];
     }; 
 
- //sort(SUF,SUF+N-1,comp);
     
  // SUF array is being divided into fragments, each of which will be sorted by
  // a separate thread. Every bucket is fully sorted by at most one thread.
- #pragma omp parallel shared(buckets,comp)
+ #pragma omp parallel shared(buckets,comp) firstprivate(N)
  {
 
     int tid = omp_get_thread_num();
