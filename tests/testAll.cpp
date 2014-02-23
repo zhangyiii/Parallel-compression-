@@ -20,6 +20,8 @@ int main() {
 // encoding
     //BWT
     pair<char*,int> enc = par_bwt_encode(in,size);
+    //printf("\n%s\n", enc.first);
+    size++;
     //MoveToFront 
     mtf_encode(enc.first, buf_1, size);
     //huffman buf_1->result.txt
@@ -32,13 +34,13 @@ int main() {
     //MoveToFront buf_1 -> buf_2
     mtf_decode(buf_1, buf_2, size);
     //BWT -> out
-    out = par_bwt_decode(make_pair(buf_2,enc.second),size);
+    out = par_bwt_decode(make_pair(buf_2,enc.second),size-1);
     // check correctness
-    //assert(strcmp(in,out)==0);
-    //cout<<"OK"<<endl;
+    assert(strcmp(in,out)==0);
+    cout<<"OK"<<endl;
 
-    printf("out:\n");
-    printf("%s\n", out);
+    //printf("out:\n");
+    //printf("%s\n", out);
 
 	return 0;
 }
