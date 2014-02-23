@@ -22,7 +22,7 @@ test_mtf_2: test_mtf_2.cpp $(DIR)/MoveToFront_0.cpp $(DIR)/MoveToFront.hpp $(DIR
 test_huff: test_huff.cpp $(DIR)/huffman.cpp $(DIR)/huffman.hpp
 	g++ $(OPTS) -o test_huff test_huff.cpp $(DIR)/huffman.cpp -lboost_serialization
 	
-testAll: test_huff.cpp $(DIR)/huffman.cpp $(DIR)/huffman.hpp $(DIR)/BurrowsWheeler.cpp $(DIR)/BurrowsWheeler.hpp $(COMMON_DEPENDECIES) $(DIR)/MoveToFront.cpp $(DIR)/MoveToFront.hpp
+testAll: testAll.cpp $(DIR)/huffman.cpp $(DIR)/huffman.hpp $(DIR)/BurrowsWheeler.cpp $(DIR)/BurrowsWheeler.hpp $(COMMON_DEPENDECIES) $(DIR)/MoveToFront.cpp $(DIR)/MoveToFront.hpp
 	g++ $(OPTS) -o testAll testAll.cpp $(DIR)/huffman.cpp $(DIR)/MoveToFront.cpp $(DIR)/BurrowsWheeler.cpp -lboost_serialization
 	
 clean:
