@@ -53,7 +53,7 @@ void DFS(node* x, vector<char>& tmp, vector<char>* codes) {
         DFS(x->right,tmp,codes);
         tmp.pop_back();
     } else {
-        codes[x->letter-'A']=tmp;
+        codes[x->letter-'@']=tmp;
         
         /*printf("%c : ", x->letter);
         for(int i = 0; i<tmp.size(); i++)
@@ -74,12 +74,12 @@ vector<char> huff_encode(char *input, int size, string fileName) {
     int P[ALPHABET_SIZE];
     for(int i=0; i<ALPHABET_SIZE; i++) P[i]=0;
     
-    for(int i=0; i<size; i++) P[input[i]-'A']++;
+    for(int i=0; i<size; i++) P[input[i]-'@']++;
     priority_queue<node*, vector<node*>, mycomparison> Q;
     
     for(int i=0; i<ALPHABET_SIZE; i++) 
     	if(P[i] > 0)
-    		Q.push(new node('A'+i, P[i]));
+    		Q.push(new node('@'+i, P[i]));
 
     while(Q.size() > 1) {
         node *x = Q.top();
@@ -98,7 +98,7 @@ vector<char> huff_encode(char *input, int size, string fileName) {
     vector<int> result;
 
     for(int i=0; i<size; i++) {
-        int x = input[i]-'A';
+        int x = input[i]-'@';
         for(int j=0; j<codes[x].size(); j++) {
             tmp.push_back(codes[x][j]);
         }
@@ -120,7 +120,16 @@ vector<char> huff_encode(char *input, int size, string fileName) {
   	
   	int x = tmp.size();
   	oa << x;
-  	for(int i = 0; i<tmp.size(); i++) oa << tmp[i];
+  	
+  	//for(int i = 0; i<tmp.size(); i++) oa << tmp[i];
+  	
+  	ofstream myfile;
+  	myfile.open("tree.txt");
+  	
+ 	for(int i = 0; i<tmp.size(); i++)
+ 		myfile<<tmp[i];
+ 		
+  	myfile.close();
     
     return tmp;
 }
@@ -137,11 +146,15 @@ std::vector<char> huff_decode(std::string fileName) {
   	
   	vector<char> tmp;
   	
+  	ifstream myfile;
+  	myfile.open("tree.txt");
+  	
   	for(int i = 0; i<size; i++) {
   		char x;
-  		ia >> x;
+  		myfile >> x;
   		tmp.push_back(x);
   	}
+  	myfile.close();
   	
   	node * root = &n, * w = &n;
   	vector<char>result;
